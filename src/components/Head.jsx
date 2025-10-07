@@ -1,7 +1,12 @@
-import React from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { Coordinates, Visibility } from "../context/contextApi";
 
 function Head() {
+  const { visible, setVisible } = useContext(Visibility);
+  const { setCoord } = useContext(Coordinates);
+  const [locHeading, setLocHeading] = useState("");
+
   const navLinks = [
     {
       name: "Swiggy Corporate",
@@ -28,14 +33,87 @@ function Head() {
       img: "fi-rr-shopping-cart-add",
     },
   ];
+  const [searchLoc, setSearchLoc] = useState([]);
+
+  async function searchLocation(e) {
+    if (e == "") return;
+    const data = await fetch(
+      `https://www.swiggy.com/dapi/misc/place-autocomplete?input=${e}`
+    );
+    const result = await data.json();
+    setSearchLoc(result?.data);
+  }
+
+  async function fetchLatAndLong(id) {
+    if (id == "") return;
+    handleClose()
+    const data = await fetch(
+      `https://www.swiggy.com/dapi/misc/address-recommend?place_id=${id}`
+    );
+    const result = await data.json();
+    setCoord({
+      lat: result.data[0]?.geometry?.location?.lat,
+      lng: result.data[0]?.geometry?.location?.lng,
+    });
+    console.log(result?.data[0]?.formatted_address);
+    setLocHeading(result?.data[0]?.formatted_address);
+  }
+
+  function handleLocationSearch() {
+    setVisible((prev) => !prev);
+  }
+  function handleClose() {
+    setVisible((prev) => !prev);
+  }
 
   return (
-    <>
-      <div className="w-full shadow-lg h-20 flex items-center justify-between">
+    <div className="relative w-full">
+      <div className="w-full">
+        <div
+          onClick={handleClose}
+          className={
+            "w-full bg-black/50 h-full absolute z-30 " +
+            (visible ? "visible" : "invisible")
+          }
+        ></div>
+        <div
+          className={
+            "bg-white flex flex-col w-[36%] h-full z-40 absolute duration-500 p-10 " +
+            (visible ? "left-0" : "-left-[100%]")
+          }
+        >
+          {/* <p
+            className="bg-black w-[10%] text-white inline-block p-2"
+            onClick={handleClose}
+          >
+            cut
+          </p> */}
+          <i onClick={handleClose} className="fi fi-rr-cross cursor-pointer max-w-fit"></i>
+          <input
+            onChange={(e) => searchLocation(e.target.value)}
+            type="search" placeholder="Search for area, street name"
+            className="border border-gray-400 shadow-lg text-md font-semibold p-5 focus:outline-none mt-5 focus:shadow-xl"
+          />
+          <div>
+            <ul className="flex flex-col gap-2 mt-5">
+              
+              {searchLoc.map((data) => ( 
+                <li onClick={() => fetchLatAndLong(data.place_id)} className="p-2 font-semibold cursor-pointer border text-sm border-gray-400 text-gray-500">
+               <i className="fi fi-rs-marker mr-2"></i>  {data.structured_formatting?.main_text}{" "}
+                  <p>{data.structured_formatting?.secondary_text}  </p>
+                </li>
+              ))}
+            </ul>
+           
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full sticky z-20 shadow-lg h-20 flex items-center justify-between">
         <div className="flex items-center  justify-between w-[88%] mx-auto gap-8">
           <div className="flex items-center gap-8">
             <Link to={"/"}>
-              <svg className="VXJlj" viewBox="0 0 61 61" height="49" width="49">
+              <svg className="VXJlj hover:scale-110 duration-200" viewBox="0 0 61 61" height="49" width="49">
                 <g clipPath="url(#a)">
                   <path
                     fill="#FF5200"
@@ -55,9 +133,15 @@ function Head() {
                 </defs>
               </svg>
             </Link>
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold border-b-2 uppercase cursor-pointer text-sm">
-                Home
+            <div onClick={handleClose} className="flex items-center gap-2">
+              <h3 className="flex gap-2">
+                <span className="font-bold border-b-2 uppercase cursor-pointer text-sm">
+                  {" "}
+                  Home
+                </span>{" "}
+                <span className="line-clamp-1 text-sm text-slate-600 font-semibold">
+                  {locHeading}
+                </span>
               </h3>
               <i className="fi fi-rr-angle-small-down cursor-pointer text-2xl mt-1 text-[#fe5300] "></i>
             </div>
@@ -76,7 +160,7 @@ function Head() {
         </div>
       </div>
       <Outlet />
-    </>
+    </div>
   );
 }
 

@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Discount from "./Discount";
 import MenuCard from "./MenuCard";
+import { Coordinates } from "../context/contextApi";
 
 function RestaurantMenu() {
   const [menuData, setMenuData] = useState([]);
   const [resInfo, setResInfo] = useState([]);
   const [discountData, setDiscountData] = useState([]);
   const { id } = useParams();
+  const {
+    coord: { lat, lng }, } = useContext(Coordinates);
   // const [currIndex, setCurrIndex] = useState(0);
   // console.log(resInfo);
 
@@ -26,7 +29,7 @@ function RestaurantMenu() {
 
   async function fetchMenu() {
     const data = await fetch(
-      `https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=28.4885651&lng=77.0109375&restaurantId=${mainId}&catalog_qa=undefined&submitAction=ENTER`
+      `https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=${lat}&lng=${lng}&restaurantId=${mainId}&catalog_qa=undefined&submitAction=ENTER`
     );
     const res = await data.json();
     setResInfo(res?.data?.cards[2]?.card?.card?.info);

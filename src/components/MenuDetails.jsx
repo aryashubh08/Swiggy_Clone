@@ -6,7 +6,7 @@ let nonVeg =
   "https://imgs.search.brave.com/g7CQZHrp-ZVk0u_Vb9kAVOm9fYKZFYgPM2rN_6lnDCI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5na2V5LmNvbS9w/bmcvZnVsbC8yNDUt/MjQ1OTA3MV9ub24t/dmVnLWljb24tbm9u/LXZlZy1zeW1ib2wt/cG5nLnBuZw";
 
 function MenuDetails({ card }) {
-  console.log(card);
+  // console.log(card);
   return (
     <div className="m-3">
       {card.map(
@@ -17,7 +17,7 @@ function MenuDetails({ card }) {
               price,
               defaultPrice,
               imageId,
-              description,
+              description = "",
               itemAttribute: { vegClassifier },
               ratings: {
                 aggregatedRating: { rating, ratingCount },

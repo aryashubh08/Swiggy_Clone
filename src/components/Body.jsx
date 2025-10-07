@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import OnYourMind from "./OnYourMind";
 import TopRestaurant from "./TopRestaurant";
 import BestPlaces from "./BestPlaces";
 import BestCuisines from "./BestCuisines";
 import OnlineFood from "./OnlineFood";
 import { Outlet } from "react-router-dom";
+import { Coordinates } from "../context/contextApi";
 
 function Body() {
   const [topRestaurantData, setTopRestaurantData] = useState([]);
@@ -14,10 +15,14 @@ function Body() {
   const [onlineTitle, setOnlineTitle] = useState("");
   //what is on your mind
   const [onYourMindData, setOnYourMindData] = useState([]);
+  const {
+    coord: { lat, lng },
+  } = useContext(Coordinates);
+  const [data,setData] = useState({})
 
   async function fetchData() {
     const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=28.4885651&lng=77.0109375&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
+      `https://www.swiggy.com/dapi/restaurants/list/v5?lat=${lat}&lng=${lng}&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING`
     );
     const result = await data.json();
     // console.log(result);
@@ -25,6 +30,7 @@ function Body() {
       result?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants
     );
+    setData(result?.data)
     setOnlineFood(
       result?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants
@@ -37,7 +43,12 @@ function Body() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [lat, lng]);
+
+
+if(data?.communication){
+  return <h1>Location unserviceable</h1>
+}
 
   https: return (
     <div className="w-full">
