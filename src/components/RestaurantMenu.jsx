@@ -9,8 +9,10 @@ function RestaurantMenu() {
   const [resInfo, setResInfo] = useState([]);
   const [discountData, setDiscountData] = useState([]);
   const { id } = useParams();
+  console.log(id);
   const {
-    coord: { lat, lng }, } = useContext(Coordinates);
+    coord: { lat, lng },
+  } = useContext(Coordinates);
   // const [currIndex, setCurrIndex] = useState(0);
   // console.log(resInfo);
 
@@ -22,16 +24,18 @@ function RestaurantMenu() {
   }
   function handleNext() {
     value >= 109 ? "" : setValue((prev) => prev + 36.35);
-    // console.log(value);
+    console.log(value);
   }
 
   var mainId = id.split("-").at(-1).replace("rest", "");
 
   async function fetchMenu() {
-    const data = await fetch(
+    let data = await fetch(
       `https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=${lat}&lng=${lng}&restaurantId=${mainId}&catalog_qa=undefined&submitAction=ENTER`
     );
-    const res = await data.json();
+    console.log(data);
+    let response = await data.json();
+    console.log(response);
     setResInfo(res?.data?.cards[2]?.card?.card?.info);
     setDiscountData(
       res?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers

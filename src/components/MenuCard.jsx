@@ -1,55 +1,103 @@
-import React, { useState } from "react";
-import MenuDetails from "./MenuDetails";
+import React, { useContext, useState } from "react";
+import { CartContext } from "../context/contextApi";
 
+let veg =
+  "https://imgs.search.brave.com/QeV3zw9-5SUPp-T6MLMYZ2toWALMcghytwXlj7EY4Sk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9i/L2IyL1ZlZ19zeW1i/b2wuc3Zn";
+let nonVeg =
+  "https://imgs.search.brave.com/g7CQZHrp-ZVk0u_Vb9kAVOm9fYKZFYgPM2rN_6lnDCI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5na2V5LmNvbS9w/bmcvZnVsbC8yNDUt/MjQ1OTA3MV9ub24t/dmVnLWljb24tbm9u/LXZlZy1zeW1ib2wt/cG5nLnBuZw";
+
+// Create a separate component for individual menu items
 function MenuCard({ card }) {
-  let hello = false;
+  const { cart, setCart } = useContext(CartContext);
+  const [isMore, setIsMore] = useState(false);
 
-  if (card["@type"]) {
-    hello = true;
+  const {
+    info: {
+      id,
+      name,
+      price,
+      defaultPrice,
+      imageId,
+      description = "",
+      itemAttribute = {},
+      ratings = {},
+    },
+  } = card;
+  console.log(card);
+
+  // Safe destructuring with fallbacks
+  const { vegClassifier = "NONVEG" } = itemAttribute;
+  const { aggregatedRating = {} } = ratings;
+  const { rating, ratingCount } = aggregatedRating;
+
+  const trimDescription =
+    description.length > 130
+      ? description.substring(0, 130) + "..."
+      : description;
+
+  function handleAddToCart() {
+    const isAdded = cart.find((data) => data.info.id === id);
+    if (!isAdded) {
+      setCart((prev) => [...prev, item]);
+    }
+    console.log(isAdded);
   }
-  const [isOpen, setIsOpen] = useState(hello);
 
-  function toggle() {
-    setIsOpen((prev) => !prev);
-  }
-
-  if (card?.itemCards) {
-    const { title, itemCards } = card;
-    return (
-      <>
-        <div className="mt-3">
-          <div className="flex justify-between items-center">
-            <h1 className={"font-bold text-" + (card["@type"] ? "17px" : "sm")}>
-              {title} ({itemCards.length})
-            </h1>
-            <i
-              className={
-                "fi  text-xl fi-rr-angle-small-" + (isOpen ? "up" : "down")
-              }
-              onClick={toggle}
-            ></i>
-          </div>
-          {isOpen && <MenuDetails card={itemCards} />}
+  return (
+    <>
+      <div className="w-full my-5 flex justify-between">
+        <div className="w-[70%]">
+          <img
+            className="w-[18px]"
+            src={vegClassifier === "VEG" ? veg : nonVeg}
+            alt={vegClassifier === "VEG" ? "Vegetarian" : "Non-Vegetarian"}
+          />
+          <h1 className="text-[17px] font-bold">{name}</h1>
+          <p className="font-semibold">
+            ₹{price ? price / 100 : defaultPrice / 100}
+          </p>
+          <p className="flex items-center">
+            {rating ? <i className="fi fi-ss-star mt-1"></i> : ""}
+            <span>
+              {rating || ""} {ratingCount ? `(${ratingCount})` : ""}
+            </span>
+          </p>
+          {description && description.length > 130 ? (
+            <div>
+              <span className="">{isMore ? description : trimDescription}</span>
+              <button
+                className="font-semibold cursor-pointer ml-1"
+                onClick={() => setIsMore(!isMore)}
+              >
+                {isMore ? "less" : "more"}
+              </button>
+            </div>
+          ) : (
+            <span className="">{description}</span>
+          )}
         </div>
-        <hr
-          className={
-            "my-3 border-slate-200 border-" +
-            (card["@type"] ? "[10px]" : "[4px]")
-          }
-        />
-      </>
-    );
-  } else {
-    const { title, categories } = card;
-    return (
-      <div>
-        <h1 className="font-bold text-[17px]">{card.title}</h1>
-        {categories.map((data) => (
-          <MenuCard card={data} />
-        ))}
+        <div className="w-[20%] relative">
+          {imageId && (
+            <img
+              className="h-[150px] w-[200px] object-cover rounded-2xl"
+              src={
+                "https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_300,h_300,c_fit/" +
+                imageId
+              }
+              alt={name}
+            />
+          )}
+          <button
+            onClick={handleAddToCart}
+            className="bg-white text-green-500 font-bold border border-slate-200 shadow cursor-pointer px-10 rounded-lg py-2 absolute -bottom-3 left-5"
+          >
+            ADD
+          </button>
+        </div>
       </div>
-    );
-  }
+      <hr className="my-8 border-slate-200" />
+    </>
+  );
 }
 
 export default MenuCard;

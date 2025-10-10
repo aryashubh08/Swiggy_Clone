@@ -1,9 +1,10 @@
 import React, { use, useContext, useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Coordinates, Visibility } from "../context/contextApi";
+import { CartContext, Coordinates, Visibility } from "../context/contextApi";
 
 function Head() {
   const { visible, setVisible } = useContext(Visibility);
+  const { cart, setCart } = useContext(CartContext);
   const { setCoord } = useContext(Coordinates);
   const [locHeading, setLocHeading] = useState("");
 
@@ -11,26 +12,32 @@ function Head() {
     {
       name: "Swiggy Corporate",
       img: "fi-rr-briefcase-blank",
+      path: "/corporate",
     },
     {
       name: "Search",
       img: " fi-rr-search",
+      path: "/search",
     },
     {
       name: "Offers",
       img: "fi-rr-badge-percent",
+      path: "/offers",
     },
     {
       name: "Help",
       img: "fi-ss-life-ring",
+      path: "/help",
     },
     {
       name: "Profile",
       img: "fi-rr-user",
+      path: "/profile",
     },
     {
       name: "Cart",
       img: "fi-rr-shopping-cart-add",
+      path: "/cart",
     },
   ];
   const [searchLoc, setSearchLoc] = useState([]);
@@ -46,7 +53,7 @@ function Head() {
 
   async function fetchLatAndLong(id) {
     if (id == "") return;
-    handleClose()
+    handleClose();
     const data = await fetch(
       `https://www.swiggy.com/dapi/misc/address-recommend?place_id=${id}`
     );
@@ -55,7 +62,7 @@ function Head() {
       lat: result.data[0]?.geometry?.location?.lat,
       lng: result.data[0]?.geometry?.location?.lng,
     });
-    console.log(result?.data[0]?.formatted_address);
+    // console.log(result?.data[0]?.formatted_address);
     setLocHeading(result?.data[0]?.formatted_address);
   }
 
@@ -67,7 +74,7 @@ function Head() {
   }
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full ">
       <div className="w-full">
         <div
           onClick={handleClose}
@@ -88,23 +95,29 @@ function Head() {
           >
             cut
           </p> */}
-          <i onClick={handleClose} className="fi fi-rr-cross cursor-pointer max-w-fit"></i>
+          <i
+            onClick={handleClose}
+            className="fi fi-rr-cross cursor-pointer max-w-fit"
+          ></i>
           <input
             onChange={(e) => searchLocation(e.target.value)}
-            type="search" placeholder="Search for area, street name"
+            type="search"
+            placeholder="Search for area, street name"
             className="border border-gray-400 shadow-lg text-md font-semibold p-5 focus:outline-none mt-5 focus:shadow-xl"
           />
           <div>
             <ul className="flex flex-col gap-2 mt-5">
-              
-              {searchLoc.map((data) => ( 
-                <li onClick={() => fetchLatAndLong(data.place_id)} className="p-2 font-semibold cursor-pointer border text-sm border-gray-400 text-gray-500">
-               <i className="fi fi-rs-marker mr-2"></i>  {data.structured_formatting?.main_text}{" "}
-                  <p>{data.structured_formatting?.secondary_text}  </p>
+              {searchLoc.map((data) => (
+                <li
+                  onClick={() => fetchLatAndLong(data.place_id)}
+                  className="p-2 font-semibold cursor-pointer border text-sm border-gray-400 text-gray-500"
+                >
+                  <i className="fi fi-rs-marker mr-2"></i>{" "}
+                  {data.structured_formatting?.main_text}{" "}
+                  <p>{data.structured_formatting?.secondary_text} </p>
                 </li>
               ))}
             </ul>
-           
           </div>
         </div>
       </div>
@@ -113,7 +126,12 @@ function Head() {
         <div className="flex items-center  justify-between w-[88%] mx-auto gap-8">
           <div className="flex items-center gap-8">
             <Link to={"/"}>
-              <svg className="VXJlj hover:scale-110 duration-200" viewBox="0 0 61 61" height="49" width="49">
+              <svg
+                className="VXJlj hover:scale-110 duration-200"
+                viewBox="0 0 61 61"
+                height="49"
+                width="49"
+              >
                 <g clipPath="url(#a)">
                   <path
                     fill="#FF5200"
@@ -148,13 +166,17 @@ function Head() {
           </div>
           <div className="flex items-center justify-center gap-10">
             {navLinks.map((link, i) => (
-              <div
+              <Link
+                to={link.path}
                 key={i}
                 className="flex items-center cursor-pointer hover:text-[#fe5300] duration-150 font-[600] text-gray-800 justify-center gap-3"
               >
                 <i className={`fi ${link.img} text-lg mt-[4px]`}></i>
                 <h3>{link.name}</h3>
-              </div>
+                {link.name === "Cart" && (
+                  <p>{cart.length > 0 && cart.length}</p>
+                )}
+              </Link>
             ))}
           </div>
         </div>

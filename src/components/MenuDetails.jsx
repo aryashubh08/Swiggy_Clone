@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { CartContext } from "../context/contextApi";
 
 let veg =
   "https://imgs.search.brave.com/QeV3zw9-5SUPp-T6MLMYZ2toWALMcghytwXlj7EY4Sk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9i/L2IyL1ZlZ19zeW1i/b2wuc3Zn";
@@ -6,11 +7,13 @@ let nonVeg =
   "https://imgs.search.brave.com/g7CQZHrp-ZVk0u_Vb9kAVOm9fYKZFYgPM2rN_6lnDCI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5na2V5LmNvbS9w/bmcvZnVsbC8yNDUt/MjQ1OTA3MV9ub24t/dmVnLWljb24tbm9u/LXZlZy1zeW1ib2wt/cG5nLnBuZw";
 
 function MenuDetails({ card }) {
-  // console.log(card);
+  console.log(card);
+  const { cart, setCart } = useContext(CartContext);
   return (
     <div className="m-3">
       {card.map(
         ({
+          card,
           card: {
             info: {
               name,
@@ -27,6 +30,14 @@ function MenuDetails({ card }) {
         }) => {
           const [isMore, setIsMore] = useState(false);
           let trimDescription = description.substring(0, 130) + "...";
+
+          function handleAddToCart() {
+            const isAdded = cart.find((data) => data.info.id === card.info.id);
+            if (!isAdded) {
+              setCart((prev) => [...prev, card]);
+            }
+            console.log(isAdded);
+          }
           return (
             <>
               <div className=" w-full my-5 flex justify-between">
@@ -72,7 +83,10 @@ function MenuDetails({ card }) {
                     }
                     alt=""
                   />
-                  <button className="bg-white text-green-500 font-bold border border-slate-200 shadow cursor-pointer px-10 rounded-lg py-2 absolute -bottom-3 left-5">
+                  <button
+                    onClick={handleAddToCart}
+                    className="bg-white text-green-500 font-bold border border-slate-200 shadow cursor-pointer px-10 rounded-lg py-2 absolute -bottom-3 left-5"
+                  >
                     ADD
                   </button>
                 </div>

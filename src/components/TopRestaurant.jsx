@@ -54,11 +54,15 @@ function TopRestaurant({ data, heading }) {
         className={`flex mt-4 gap-5 w-full duration-300`}
         style={{ translate: `-${value}%` }}
       >
-        {data.map(({ info, cta: { link } }) => (
-          <div className="hover:scale-95 duration-300" key={info.id}>
-            <Card {...info} link={link} />
-          </div>
-        ))}
+        {data?.map((item) => {
+          const info = item.info;
+          const link = item.cta?.link; // safe access
+          return (
+            <div className="hover:scale-95 duration-300" key={info?.id}>
+              <Card {...info} link={link} />
+            </div>
+          );
+        })}
       </div>
 
       <hr className="border mt-10 text-gray-300" />

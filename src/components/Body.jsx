@@ -18,7 +18,7 @@ function Body() {
   const {
     coord: { lat, lng },
   } = useContext(Coordinates);
-  const [data,setData] = useState({})
+  const [data, setData] = useState({});
 
   async function fetchData() {
     const data = await fetch(
@@ -30,7 +30,7 @@ function Body() {
       result?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants
     );
-    setData(result?.data)
+    setData(result?.data);
     setOnlineFood(
       result?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants
@@ -45,10 +45,13 @@ function Body() {
     fetchData();
   }, [lat, lng]);
 
-
-if(data?.communication){
-  return <h1>Location unserviceable</h1>
-}
+  if (data?.communication) {
+    return (
+      <h1 className="flex items-center justify-center mt-10">
+        Location unserviceable
+      </h1>
+    );
+  }
 
   https: return (
     <div className="w-full">
